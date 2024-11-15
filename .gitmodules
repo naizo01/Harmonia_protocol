@@ -7,3 +7,6 @@
 [submodule "contracts/lib/openzeppelin-contracts"]
 	path = contracts/lib/openzeppelin-contracts
 	url = https://github.com/openzeppelin/openzeppelin-contracts
+[submodule "contracts/lib/sign-protocol-evm"]
+	path = contracts/lib/sign-protocol-evm
+	url = https://github.com/EthSign/sign-protocol-evm
