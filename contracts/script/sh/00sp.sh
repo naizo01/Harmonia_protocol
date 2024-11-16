@@ -7,7 +7,7 @@ else
 fi
 
 # forge scriptコマンドを実行
-forge script script/00_test.s.sol:TestScript \
+forge script script/00_SP.s.sol:spScript \
   --rpc-url $RPC_URL \
   --private-key $PRIVATE_KEY \
   --broadcast \

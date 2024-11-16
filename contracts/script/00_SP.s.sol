@@ -8,7 +8,7 @@ import {MockERC20} from "solmate/src/test/utils/mocks/MockERC20.sol";
 import {SP} from "sign-protocol/core/SP.sol";
 
 /// @notice Deploys the WhitelistHook contract
-contract TestScript is DeployBase {
+contract spScript is DeployBase {
     function setUp() public {}
 
     function run() public {
