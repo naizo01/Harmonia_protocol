@@ -61,7 +61,7 @@ export function TokenInput({
         </DropdownMenu>
       </div>
       <div className="px-4 flex justify-between text-sm text-muted-foreground">
-        <div>$0</div>
+        <div></div>
         <div className="flex items-center gap-1">
           <span>{selectedToken ? `${selectedToken.balance.toFixed(3)} ${selectedToken.symbol}` : "N/A"}</span>
           {onMaxClick && selectedToken && (

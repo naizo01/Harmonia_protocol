@@ -1,62 +1,62 @@
 [
   {
-    "type": "constructor",
-    "inputs": [{ "name": "_manager", "type": "address", "internalType": "contract IPoolManager" }],
-    "stateMutability": "nonpayable"
+    "inputs": [{ "internalType": "contract IPoolManager", "name": "_manager", "type": "address" }],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
   },
+  { "inputs": [], "name": "NoSwapOccurred", "type": "error" },
   {
-    "type": "function",
-    "name": "manager",
     "inputs": [],
-    "outputs": [{ "name": "", "type": "address", "internalType": "contract IPoolManager" }],
-    "stateMutability": "view"
+    "name": "manager",
+    "outputs": [{ "internalType": "contract IPoolManager", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    "type": "function",
-    "name": "swap",
     "inputs": [
       {
-        "name": "key",
-        "type": "tuple",
+        "components": [
+          { "internalType": "Currency", "name": "currency0", "type": "address" },
+          { "internalType": "Currency", "name": "currency1", "type": "address" },
+          { "internalType": "uint24", "name": "fee", "type": "uint24" },
+          { "internalType": "int24", "name": "tickSpacing", "type": "int24" },
+          { "internalType": "contract IHooks", "name": "hooks", "type": "address" }
+        ],
         "internalType": "struct PoolKey",
-        "components": [
-          { "name": "currency0", "type": "address", "internalType": "Currency" },
-          { "name": "currency1", "type": "address", "internalType": "Currency" },
-          { "name": "fee", "type": "uint24", "internalType": "uint24" },
-          { "name": "tickSpacing", "type": "int24", "internalType": "int24" },
-          { "name": "hooks", "type": "address", "internalType": "contract IHooks" }
-        ]
+        "name": "key",
+        "type": "tuple"
       },
       {
-        "name": "params",
-        "type": "tuple",
+        "components": [
+          { "internalType": "bool", "name": "zeroForOne", "type": "bool" },
+          { "internalType": "int256", "name": "amountSpecified", "type": "int256" },
+          { "internalType": "uint160", "name": "sqrtPriceLimitX96", "type": "uint160" }
+        ],
         "internalType": "struct IPoolManager.SwapParams",
-        "components": [
-          { "name": "zeroForOne", "type": "bool", "internalType": "bool" },
-          { "name": "amountSpecified", "type": "int256", "internalType": "int256" },
-          { "name": "sqrtPriceLimitX96", "type": "uint160", "internalType": "uint160" }
-        ]
+        "name": "params",
+        "type": "tuple"
       },
       {
-        "name": "testSettings",
-        "type": "tuple",
-        "internalType": "struct PoolSwapTest.TestSettings",
         "components": [
-          { "name": "takeClaims", "type": "bool", "internalType": "bool" },
-          { "name": "settleUsingBurn", "type": "bool", "internalType": "bool" }
-        ]
+          { "internalType": "bool", "name": "takeClaims", "type": "bool" },
+          { "internalType": "bool", "name": "settleUsingBurn", "type": "bool" }
+        ],
+        "internalType": "struct PoolSwapTest.TestSettings",
+        "name": "testSettings",
+        "type": "tuple"
       },
-      { "name": "hookData", "type": "bytes", "internalType": "bytes" }
+      { "internalType": "bytes", "name": "hookData", "type": "bytes" }
     ],
-    "outputs": [{ "name": "delta", "type": "int256", "internalType": "BalanceDelta" }],
-    "stateMutability": "payable"
+    "name": "swap",
+    "outputs": [{ "internalType": "BalanceDelta", "name": "delta", "type": "int256" }],
+    "stateMutability": "payable",
+    "type": "function"
   },
   {
-    "type": "function",
+    "inputs": [{ "internalType": "bytes", "name": "rawData", "type": "bytes" }],
     "name": "unlockCallback",
-    "inputs": [{ "name": "rawData", "type": "bytes", "internalType": "bytes" }],
-    "outputs": [{ "name": "", "type": "bytes", "internalType": "bytes" }],
-    "stateMutability": "nonpayable"
-  },
-  { "type": "error", "name": "NoSwapOccurred", "inputs": [] }
+    "outputs": [{ "internalType": "bytes", "name": "", "type": "bytes" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
 ]

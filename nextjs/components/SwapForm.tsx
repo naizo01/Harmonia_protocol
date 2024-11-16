@@ -28,13 +28,13 @@ export function SwapForm({
 }: SwapFormProps) {
   return (
     <>
-      <div className="p-4 flex justify-between items-center border-b">
-        <div className="font-semibold">Swap</div>
+      <div className="p-3 flex justify-between items-center border-b">
+        <div className="font-semibold mx-4">Swap</div>
         <Button variant="ghost" size="icon">
           <Settings className="h-5 w-5" />
         </Button>
       </div>
-      <div className="p-4 space-y-4">
+      <div className="p-4 space-y-2">
         <TokenInput
           tokensList={tokensList}
           selectedToken={tokens[0]}
@@ -45,7 +45,7 @@ export function SwapForm({
           onMaxClick={onMaxClick}
         />
 
-        <div className="flex justify-center -my-2">
+        <div className="flex justify-center -my-1">
           <Button variant="ghost" size="icon" className="rounded-full bg-muted z-10" onClick={onSwapTokens}>
             <ArrowUpDown className="h-4 w-4" />
           </Button>

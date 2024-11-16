@@ -1,10 +1,14 @@
 import { UniswapDesktop } from "../components/UniswapDesktop";
+import { LitProvider } from "../context/LitContext";
+import { VerificationProvider } from "../context/VerificationContext";
 
-const Home: NextPage = () => {
+const Home = () => {
   return (
-    <>
-      <UniswapDesktop />
-    </>
+    <LitProvider>
+      <VerificationProvider>
+        <UniswapDesktop />
+      </VerificationProvider>
+    </LitProvider>
   );
 };
 
