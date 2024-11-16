@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Input } from "./ui/input";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { ArrowUpDown, Check, ChevronDown, Info, Loader2, Search, Settings } from "lucide-react";
 
 type Token = {
@@ -99,12 +100,7 @@ export function UniswapDesktop() {
           </nav>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon">
-            <Search className="h-5 w-5" />
-          </Button>
-          <Button variant="ghost" className="rounded-full">
-            <div className="h-6 w-6 rounded-full bg-violet-600" />
-          </Button>
+          <ConnectButton />
         </div>
       </header>
 
