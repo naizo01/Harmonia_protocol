@@ -43,21 +43,18 @@ class SignService {
         ));
     }
 
-    async createAttestation(type, userData) {
+    async createAttestation(type, userData, indexingValue) {
         try {
             const schemaId = type === 'participation'
                 ? this.schemaIds.participationSchemaId
                 : this.schemaIds.activeUserSchemaId;
-
-            const encryptedDiscordId = encrypt(userData.discordId);
-            userData.discordId = encryptedDiscordId;
 
             console.log('Creating attestation with data:', userData);
 
             const attestation = await this.signClient.createAttestation({
                 schemaId: schemaId,
                 data: userData,
-                indexingValue: encryptedDiscordId.toLowerCase()
+                indexingValue: indexingValue.toLowerCase(),
             });
 
             console.log('Attestation created:', attestation);
@@ -68,11 +65,10 @@ class SignService {
         }
     }
 
-    async verifyAttestations(discordId) {
+    async verifyAttestations(indexingValue) {
         try {
-            const encryptedDiscordId = encrypt(discordId);
             const attestations = await this.indexService.queryAttestationList({
-                indexingValue: encryptedDiscordId.toLowerCase(),
+                indexingValue: indexingValue.toLowerCase(),
                 mode: "onchain"
             });
             if (!attestations.rows || attestations.rows.length === 0) {
