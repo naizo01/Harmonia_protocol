@@ -7,8 +7,11 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/t
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { ArrowUpDown, Check, ChevronDown, Info, Loader2, Search, Settings } from "lucide-react";
 import { parseEther } from "viem";
-import { useAccount, useChainId, useWriteContract } from "wagmi";
-import { useUniswapV4Swap } from "~~/components/hooks/use-uniswap";
+import { useAccount, useChainId, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+// import {useUniswapV4Swap} from "~~/hooks/use-uniswap";
+import { contractsAddress } from "~~/lib/constants/address";
+import { abis } from "~~/lib/constants/abi";
+import { simulateContract } from "viem/actions/public/simulateContract";
 
 type Token = {
   symbol: string;
@@ -17,19 +20,16 @@ type Token = {
   balance: number;
   address: string;
 };
-
-const tokens: Token[] = [
-  { symbol: "ETH", name: "Ethereum", icon: "🔷", balance: 0.19, address: "0x0000000000000000000000000000000000000000" },
-  { symbol: "USDT", name: "Tether", icon: "💵", balance: 1000, address: "0x" },
-  { symbol: "DAI", name: "Dai", icon: "🟡", balance: 500, address: "0x" },
-  { symbol: "USDC", name: "USD Coin", icon: "🔵", balance: 750, address: "0x" },
-];
-
-export function UniswapDesktop() {
+export function UniswapDesktop(callbacks?: { onSuccessWrite?: (data: any) => void; onError?: (error: any) => void }) {
+  const chainId = useChainId();
+  const tokens: Token[] = [
+    { symbol: "ETH", name: "Ethereum", icon: "🔷", balance: 0.19, address: contractsAddress[chainId]?.currency0 },
+    { symbol: "USDT", name: "Tether", icon: "💵", balance: 1000, address: contractsAddress[chainId]?.currency1 },
+  ];
+  const token1 = tokens[0];
+  const token2 = tokens[1];
   const [amount1, setAmount1] = useState("");
   const [amount2, setAmount2] = useState("");
-  const [token1, setToken1] = useState<Token>(tokens[0]);
-  const [token2, setToken2] = useState<Token>(tokens[1]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [swapResult, setSwapResult] = useState({
     swappedAmount: "",
@@ -41,8 +41,86 @@ export function UniswapDesktop() {
   const [volatility, setVolatility] = useState<"low" | "medium" | "high">("medium");
   const [isLoading, setIsLoading] = useState(false);
   const { address } = useAccount();
+  const { writeContractAsync } = useWriteContract();
+  const [txHash, setTxHash] = useState<string | null>(null);
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [receipt, setReceipt] = useState<any>(null);
+  const writeFn = useWriteContract();
+  const {
+    data: waitReceipt,
+    isSuccess,
+    isError,
+  } = useWaitForTransactionReceipt({
+    hash: writeFn?.data,
+    chainId,
+  });
 
-  const { executeSwap, isConfirming } = useUniswapV4Swap(token1, token2, amount1);
+  const isToken0First = tokens[0].address.toLowerCase() < token2.address.toLowerCase();
+  const poolKey = {
+    currency0: isToken0First ? token1.address : token2.address,
+    currency1: isToken0First ? token2.address : token1.address,
+    fee: 3000,
+    tickSpacing: 60,
+    hooks: "0x55B8Cbc337359Da1a257dc1AC2b40e03cc064aC0",
+  };
+  const swapParams = {
+    zeroForOne: isToken0First,
+    amountSpecified: BigInt(1000000000000000000),
+    sqrtPriceLimitX96: BigInt(4295128740),
+  };
+  const testSettings = {
+    takeClaims: false,
+    settleUsingBurn: false,
+  };
+  const swapConfig = {
+    address: contractsAddress[chainId]?.poolSwapTest,
+    abi: abis.poolSwapTest,
+    functionName: "swap",
+    args: [poolKey, swapParams, testSettings, "0x"],
+    chainId,
+  };
+
+  console.log(swapConfig);
+  console.log(waitReceipt);
+  useEffect(() => {
+    if (isSuccess) {
+      console.log("Transaction confirmed:", waitReceipt);
+      setReceipt(waitReceipt);
+      setIsConfirming(false);
+    }
+
+    if (isError) {
+      console.error("Transaction failed.");
+      setIsConfirming(false);
+    }
+  }, [isSuccess, isError, waitReceipt]);
+
+  // const simulateSwap = async () => {
+  //     try {
+  //         console.log("Simulating swap...");
+  //         const simulationResult = await simulateContract(swapConfig);
+  //
+  //         if (simulationResult) {
+  //             console.log("Simulation successful:", simulationResult);
+  //             return simulationResult;
+  //         } else {
+  //             throw new Error("Simulation failed with no result.");
+  //         }
+  //     } catch (error) {
+  //         console.error("Simulation error:", error);
+  //         throw error;
+  //     }
+  // };
+  const executeSwap = async () => {
+    if (!address || !amount1) return;
+    try {
+      writeFn.writeContract(swapConfig);
+      console.log(waitReceipt);
+    } catch (error) {
+      console.error("Swap failed:", error);
+      throw error;
+    }
+  };
 
   const handleSwapClick = async () => {
     try {
@@ -81,8 +159,8 @@ export function UniswapDesktop() {
   }, []);
 
   const handleSwap = () => {
-    setToken1(token2);
-    setToken2(token1);
+    // setToken1(token2);
+    // setToken2(token1);
     setAmount1(amount2);
     setAmount2(amount1);
   };
@@ -148,7 +226,7 @@ export function UniswapDesktop() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     {tokens.map(token => (
-                      <DropdownMenuItem key={token.symbol} onSelect={() => setToken1(token)}>
+                      <DropdownMenuItem key={token.symbol} onSelect={() => token1}>
                         <div className="flex items-center gap-2">
                           <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center">
                             {token.icon}
@@ -202,7 +280,7 @@ export function UniswapDesktop() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     {tokens.map(token => (
-                      <DropdownMenuItem key={token.symbol} onSelect={() => setToken2(token)}>
+                      <DropdownMenuItem key={token.symbol} onSelect={() => token2}>
                         <div className="flex items-center gap-2">
                           <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center">
                             {token.icon}

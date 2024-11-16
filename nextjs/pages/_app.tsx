@@ -1,10 +1,11 @@
+// グローバルなCSSをインポート
 import type { AppProps } from "next/app";
 import "./globals.css";
 import { getDefaultConfig } from "@rainbow-me/rainbowkit";
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import "@rainbow-me/rainbowkit/styles.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Chain, baseSepolia, localhost, sepolia } from "viem/chains";
+import { Chain, baseSepolia, anvil, sepolia } from "viem/chains";
 import { WagmiProvider } from "wagmi";
 
 const DynamicFeeApp = ({ Component, pageProps }: AppProps) => {
@@ -16,7 +17,7 @@ const DynamicFeeApp = ({ Component, pageProps }: AppProps) => {
     },
   });
 
-  const chains = [sepolia, baseSepolia, localhost] as [Chain, ...Chain[]];
+  const chains = [sepolia, baseSepolia, anvil] as [Chain, ...Chain[]];
 
   const config = getDefaultConfig({
     appName: "dynamicFee App",
