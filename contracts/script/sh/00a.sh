@@ -10,9 +10,8 @@ fi
 forge script script/00_WhitelistHook.s.sol:WhitelistHookScript \
   --rpc-url $RPC_URL \
   --chain-id $CHAIN_ID \
+  --verifier-url $SCAN_URL \
   --private-key $PRIVATE_KEY \
+  --etherscan-api-key $SCAN_API_KEY \
   --broadcast \
-  -vvvv
-  # --verify \
-  # --verifier-url $SCAN_URL \
-  # --etherscan-api-key $SCAN_API_KEY \
+  --verify -vvvv
