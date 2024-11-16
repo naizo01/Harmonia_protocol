@@ -1,0 +1,27 @@
+{
+  "name": "sign",
+  "version": "1.0.0",
+  "description": "",
+  "main": "express/src/server.js",
+  "scripts": {
+    "start": "node express/src/server.js",
+    "dev": "nodemon express/src/server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@ethsign/sp-sdk": "^0.7.7",
+    "axios": "^1.7.7",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "discord.js": "^14.16.3",
+    "dotenv": "^16.4.5",
+    "ethers": "^5.7.2",
+    "express": "^4.18.2",
+    "fs": "^0.0.1-security",
+    "viem": "^2.21.37"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
+}
