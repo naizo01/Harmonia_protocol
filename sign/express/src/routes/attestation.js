@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { verifySignature } = require('../middleware/auth');
+const {verifySignature} = require('../middleware/auth');
 const signService = require('../../../lib/sign');
 
 router.post('/create-attestation', verifySignature, async (req, res) => {
@@ -11,8 +11,8 @@ router.post('/create-attestation', verifySignature, async (req, res) => {
             discordId: data.discordId,
             communityId: data.communityId,
             address: data.address,
-            timestamp: Math.floor(data.timestamp / 1000)
-        });
+            timestamp: Math.floor(data.timestamp / 1000),
+        }, data.indexingValue);
 
         res.json({
             success: true,
@@ -21,18 +21,18 @@ router.post('/create-attestation', verifySignature, async (req, res) => {
         });
     } catch (error) {
         console.error('Attestation creation error:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({error: error.message});
     }
 });
-router.get('/verify/:discordId', async (req, res) => {
+router.get('/verify/:indexingValue', async (req, res) => {
     try {
-        const { discordId } = req.params;
-        const attestations = await signService.verifyAttestations(discordId);
+        const {indexingValue} = req.params;
+        const attestations = await signService.verifyAttestations(indexingValue);
         const formattedResponse = formatAttestationResponse(attestations);
 
         res.json({
             success: true,
-            discordId,
+            indexingValue,
             ...formattedResponse
         });
     } catch (error) {
@@ -46,7 +46,7 @@ router.get('/verify/:discordId', async (req, res) => {
 
 router.get('/guild-members/:guildId', async (req, res) => {
     try {
-        const { guildId } = req.params;
+        const {guildId} = req.params;
         const members = await fetchAllGuildMembers(guildId);
 
         res.json({
