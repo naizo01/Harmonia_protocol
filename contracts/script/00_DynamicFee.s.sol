@@ -8,17 +8,21 @@ import {Hooks} from "v4-core/src/libraries/Hooks.sol";
 import {IPoolManager} from "v4-core/src/interfaces/IPoolManager.sol";
 
 import {Constants} from "./base/Constants.sol";
-import {DynamicFee} from "../src/DynamicFee.sol";
+import {HarmoniaDynamicFee} from "../src/HarmoniaDynamicFee.sol";
 import {HookMiner} from "../test/utils/HookMiner.sol";
 
-/// @notice Mines the address and deploys the DynamicFee.sol Hook contract
-contract DynamicFeeScript is DeployBase, Constants {
+/// @notice Mines the address and deploys the HarmoniaDynamicFee.sol Hook contract
+contract HarmoniaDynamicFeeScript is DeployBase, Constants {
     function setUp() public {}
 
     function run() public {
         address sp = readDeployedAddress("SP");
         address pyth = readDeployedAddress("PYTH");
-        bytes32 pyth_price_feed_id = bytes32(uint256(0x78d185a741d07edb3412b09008b7c5cfb9bbbd7d568bf00ba737b456ba171501));
+        bytes32 pyth_price_feed_id = bytes32(
+            uint256(
+                0x78d185a741d07edb3412b09008b7c5cfb9bbbd7d568bf00ba737b456ba171501
+            )
+        );
 
         // hook contracts must have specific flags encoded in the address
         uint160 flags = uint160(
@@ -36,13 +40,13 @@ contract DynamicFeeScript is DeployBase, Constants {
         (address hookAddress, bytes32 salt) = HookMiner.find(
             CREATE2_DEPLOYER,
             flags,
-            type(DynamicFee).creationCode,
+            type(HarmoniaDynamicFee).creationCode,
             constructorArgs
         );
 
         // Deploy the hook using CREATE2
         vm.broadcast();
-        DynamicFee dynamicFee = new DynamicFee{salt: salt}(
+        HarmoniaDynamicFee dynamicFee = new HarmoniaDynamicFee{salt: salt}(
             IPoolManager(POOLMANAGER),
             sp,
             pyth,
@@ -54,7 +58,7 @@ contract DynamicFeeScript is DeployBase, Constants {
 
         require(
             address(dynamicFee) == hookAddress,
-            "DynamicFeeScript: hook address mismatch"
+            "HarmoniaDynamicFeeScript: hook address mismatch"
         );
     }
 }

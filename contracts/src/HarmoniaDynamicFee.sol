@@ -12,7 +12,7 @@ import {Attestation} from "sign-protocol/models/Attestation.sol";
 import {SP} from "sign-protocol/core/SP.sol";
 import "@pythnetwork/pyth-sdk-solidity/IPyth.sol";
 
-contract DynamicFee is BaseHook {
+contract HarmoniaDynamicFee is BaseHook {
     using StateLibrary for IPoolManager;
 
     // Special fee for registered accounts

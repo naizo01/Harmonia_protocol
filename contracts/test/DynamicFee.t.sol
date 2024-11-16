@@ -11,7 +11,7 @@ import {BalanceDelta} from "v4-core/src/types/BalanceDelta.sol";
 import {PoolId, PoolIdLibrary} from "v4-core/src/types/PoolId.sol";
 import {CurrencyLibrary, Currency} from "v4-core/src/types/Currency.sol";
 import {PoolSwapTest} from "v4-core/src/test/PoolSwapTest.sol";
-import {DynamicFee} from "../src/DynamicFee.sol";
+import {HarmoniaDynamicFee} from "../src/HarmoniaDynamicFee.sol";
 import {StateLibrary} from "v4-core/src/libraries/StateLibrary.sol";
 import {LPFeeLibrary} from "v4-core/src/libraries/LPFeeLibrary.sol";
 
@@ -30,13 +30,13 @@ import {Attestation} from "sign-protocol/models/Attestation.sol";
 import "@pythnetwork/pyth-sdk-solidity/IPyth.sol";
 import {MockPyth} from "@pythnetwork/pyth-sdk-solidity/MockPyth.sol";
 
-contract DynamicFeeTest is Test, Fixtures {
+contract HarmoniaDynamicFeeTest is Test, Fixtures {
     using EasyPosm for IPositionManager;
     using PoolIdLibrary for PoolKey;
     using CurrencyLibrary for Currency;
     using StateLibrary for IPoolManager;
 
-    DynamicFee hook;
+    HarmoniaDynamicFee hook;
     PoolId poolId;
 
     uint256 tokenId;
@@ -78,8 +78,12 @@ contract DynamicFeeTest is Test, Fixtures {
             ETH_PRICE_FEED_ID,
             false
         ); //Add all the necessary constructor arguments from the hook
-        deployCodeTo("DynamicFee.sol:DynamicFee", constructorArgs, flags);
-        hook = DynamicFee(flags);
+        deployCodeTo(
+            "HarmoniaDynamicFee.sol:HarmoniaDynamicFee",
+            constructorArgs,
+            flags
+        );
+        hook = HarmoniaDynamicFee(flags);
 
         // Create the pool
         key = PoolKey(
