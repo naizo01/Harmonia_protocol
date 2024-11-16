@@ -10,3 +10,6 @@
 [submodule "contracts/lib/sign-protocol-evm"]
 	path = contracts/lib/sign-protocol-evm
 	url = https://github.com/EthSign/sign-protocol-evm
+[submodule "contracts/lib/v4-core"]
+	path = contracts/lib/v4-core
+	url = https://github.com/uniswap/v4-core
