@@ -7,14 +7,11 @@ else
 fi
 
 # forge scriptコマンドを実行
-forge script script/00_SP.s.sol:spScript \
+forge script script/01a_CreatePoolOnly.s.sol:CreatePoolOnly \
   --rpc-url $RPC_URL \
-  --private-key $PRIVATE_KEY \
-  --broadcast \
   --chain-id $CHAIN_ID \
-  --gas-estimate-multiplier 300 \
-  --priority-gas-price 100000000 \
-  -vvvv
   --verifier-url $SCAN_URL \
+  --private-key $PRIVATE_KEY \
   --etherscan-api-key $SCAN_API_KEY \
-  --verify \
+  --broadcast \
+  --verify -vvvv

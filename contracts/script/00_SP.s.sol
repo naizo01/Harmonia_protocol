@@ -17,7 +17,7 @@ contract spScript is DeployBase {
 
         // WhitelistHookコントラクトをデプロイ
         SP sp = new SP();
-        sp.initialize(1,1);
+        // sp.initialize(1,1);
 
         writeDeployedAddress(address(sp), "SP");
 
