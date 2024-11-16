@@ -23,14 +23,18 @@ import {IAllowanceTransfer} from "permit2/src/interfaces/IAllowanceTransfer.sol"
 import {DeployPermit2} from "../test/utils/forks/DeployPermit2.sol";
 import {IERC20} from "forge-std/interfaces/IERC20.sol";
 import {IPositionDescriptor} from "v4-periphery/src/interfaces/IPositionDescriptor.sol";
-import {IWETH9} from "v4-periphery/src/interfaces/external/IWETH9.sol";
 
 /// @notice Forge script for deploying v4 & hooks to **anvil**
 /// @dev This script only works on an anvil RPC because v4 exceeds bytecode limits
 contract CounterScript is Script, DeployPermit2 {
     using EasyPosm for IPositionManager;
 
-    address constant CREATE2_DEPLOYER = address(0x4e59b44847b379578588920cA78FbF26c0B4956C);
+    // chiliz address
+    address constant CREATE2_DEPLOYER =
+        address(0x333AA54C25A171dc2d425eBF17b4C4458738202D);
+
+    // old
+    // address constant CREATE2_DEPLOYER = address(0x4e59b44847b379578588920cA78FbF26c0B4956C);
 
     function setUp() public {}
 
@@ -40,25 +44,38 @@ contract CounterScript is Script, DeployPermit2 {
 
         // hook contracts must have specific flags encoded in the address
         uint160 permissions = uint160(
-            Hooks.BEFORE_SWAP_FLAG | Hooks.AFTER_SWAP_FLAG | Hooks.BEFORE_ADD_LIQUIDITY_FLAG
-                | Hooks.BEFORE_REMOVE_LIQUIDITY_FLAG
+            Hooks.BEFORE_SWAP_FLAG |
+                Hooks.AFTER_SWAP_FLAG |
+                Hooks.BEFORE_ADD_LIQUIDITY_FLAG |
+                Hooks.BEFORE_REMOVE_LIQUIDITY_FLAG
         );
 
         // Mine a salt that will produce a hook address with the correct permissions
-        (address hookAddress, bytes32 salt) =
-            HookMiner.find(CREATE2_DEPLOYER, permissions, type(Counter).creationCode, abi.encode(address(manager)));
+        (address hookAddress, bytes32 salt) = HookMiner.find(
+            CREATE2_DEPLOYER,
+            permissions,
+            type(Counter).creationCode,
+            abi.encode(address(manager))
+        );
 
         // ----------------------------- //
         // Deploy the hook using CREATE2 //
         // ----------------------------- //
         vm.broadcast();
         Counter counter = new Counter{salt: salt}(manager);
-        require(address(counter) == hookAddress, "CounterScript: hook address mismatch");
+        require(
+            address(counter) == hookAddress,
+            "CounterScript: hook address mismatch"
+        );
 
         // Additional helpers for interacting with the pool
         vm.startBroadcast();
         IPositionManager posm = deployPosm(manager);
-        (PoolModifyLiquidityTest lpRouter, PoolSwapTest swapRouter,) = deployRouters(manager);
+        (
+            PoolModifyLiquidityTest lpRouter,
+            PoolSwapTest swapRouter,
+
+        ) = deployRouters(manager);
         vm.stopBroadcast();
 
         // test the lifecycle (create pool, add liquidity, swap)
@@ -71,32 +88,62 @@ contract CounterScript is Script, DeployPermit2 {
     // Helpers
     // -----------------------------------------------------------
     function deployPoolManager() internal returns (IPoolManager) {
-        return IPoolManager(address(new PoolManager(address(0))));
+        return IPoolManager(address(new PoolManager()));
     }
 
-    function deployRouters(IPoolManager manager)
+    function deployRouters(
+        IPoolManager manager
+    )
         internal
-        returns (PoolModifyLiquidityTest lpRouter, PoolSwapTest swapRouter, PoolDonateTest donateRouter)
+        returns (
+            PoolModifyLiquidityTest lpRouter,
+            PoolSwapTest swapRouter,
+            PoolDonateTest donateRouter
+        )
     {
         lpRouter = new PoolModifyLiquidityTest(manager);
         swapRouter = new PoolSwapTest(manager);
         donateRouter = new PoolDonateTest(manager);
     }
 
-    function deployPosm(IPoolManager poolManager) public returns (IPositionManager) {
+    function deployPosm(
+        IPoolManager poolManager
+    ) public returns (IPositionManager) {
         anvilPermit2();
-        return IPositionManager(new PositionManager(poolManager, permit2, 300_000, IPositionDescriptor(address(0)), IWETH9(address(0))));
+        return
+            IPositionManager(
+                new PositionManager(
+                    poolManager,
+                    permit2,
+                    300_000,
+                    IPositionDescriptor(address(0))
+                )
+            );
     }
 
-    function approvePosmCurrency(IPositionManager posm, Currency currency) internal {
+    function approvePosmCurrency(
+        IPositionManager posm,
+        Currency currency
+    ) internal {
         // Because POSM uses permit2, we must execute 2 permits/approvals.
         // 1. First, the caller must approve permit2 on the token.
-        IERC20(Currency.unwrap(currency)).approve(address(permit2), type(uint256).max);
+        IERC20(Currency.unwrap(currency)).approve(
+            address(permit2),
+            type(uint256).max
+        );
         // 2. Then, the caller must approve POSM as a spender of permit2
-        permit2.approve(Currency.unwrap(currency), address(posm), type(uint160).max, type(uint48).max);
+        permit2.approve(
+            Currency.unwrap(currency),
+            address(posm),
+            type(uint160).max,
+            type(uint48).max
+        );
     }
 
-    function deployTokens() internal returns (MockERC20 token0, MockERC20 token1) {
+    function deployTokens()
+        internal
+        returns (MockERC20 token0, MockERC20 token1)
+    {
         MockERC20 tokenA = new MockERC20("MockA", "A", 18);
         MockERC20 tokenB = new MockERC20("MockB", "B", 18);
         if (uint160(address(tokenA)) < uint160(address(tokenB))) {
@@ -123,8 +170,13 @@ contract CounterScript is Script, DeployPermit2 {
 
         // initialize the pool
         int24 tickSpacing = 60;
-        PoolKey memory poolKey =
-            PoolKey(Currency.wrap(address(token0)), Currency.wrap(address(token1)), 3000, tickSpacing, IHooks(hook));
+        PoolKey memory poolKey = PoolKey(
+            Currency.wrap(address(token0)),
+            Currency.wrap(address(token1)),
+            3000,
+            tickSpacing,
+            IHooks(hook)
+        );
         manager.initialize(poolKey, Constants.SQRT_PRICE_1_1);
 
         // approve the tokens to the routers
@@ -140,7 +192,10 @@ contract CounterScript is Script, DeployPermit2 {
         lpRouter.modifyLiquidity(
             poolKey,
             IPoolManager.ModifyLiquidityParams(
-                TickMath.minUsableTick(tickSpacing), TickMath.maxUsableTick(tickSpacing), 100 ether, 0
+                TickMath.minUsableTick(tickSpacing),
+                TickMath.maxUsableTick(tickSpacing),
+                100 ether,
+                0
             ),
             ZERO_BYTES
         );
@@ -163,10 +218,12 @@ contract CounterScript is Script, DeployPermit2 {
         IPoolManager.SwapParams memory params = IPoolManager.SwapParams({
             zeroForOne: zeroForOne,
             amountSpecified: amountSpecified,
-            sqrtPriceLimitX96: zeroForOne ? TickMath.MIN_SQRT_PRICE + 1 : TickMath.MAX_SQRT_PRICE - 1 // unlimited impact
+            sqrtPriceLimitX96: zeroForOne
+                ? TickMath.MIN_SQRT_PRICE + 1
+                : TickMath.MAX_SQRT_PRICE - 1 // unlimited impact
         });
-        PoolSwapTest.TestSettings memory testSettings =
-            PoolSwapTest.TestSettings({takeClaims: false, settleUsingBurn: false});
+        PoolSwapTest.TestSettings memory testSettings = PoolSwapTest
+            .TestSettings({takeClaims: false, settleUsingBurn: false});
         swapRouter.swap(poolKey, params, testSettings, ZERO_BYTES);
     }
 }

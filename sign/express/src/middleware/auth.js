@@ -10,8 +10,7 @@ const verifySignature = async (req, res, next) => {
             return res.status(401).json({ error: 'Invalid signature' });
         }
 
-        // const decodedToken = await web3auth.verifyIdToken(idToken);
-
+        // verify IdToken
         // if (decodedToken.sub !== data.discordId) {
         //     return res.status(401).json({ error: 'Discord ID mismatch' });
         // }
