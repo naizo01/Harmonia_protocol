@@ -6,19 +6,23 @@ import { Input } from "./ui/input";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { ArrowUpDown, Check, ChevronDown, Info, Loader2, Search, Settings } from "lucide-react";
+import { parseEther } from "viem";
+import { useAccount, useChainId, useWriteContract } from "wagmi";
+import { useUniswapV4Swap } from "~~/components/hooks/use-uniswap";
 
 type Token = {
   symbol: string;
   name: string;
   icon: string;
   balance: number;
+  address: string;
 };
 
 const tokens: Token[] = [
-  { symbol: "ETH", name: "Ethereum", icon: "🔷", balance: 0.19 },
-  { symbol: "USDT", name: "Tether", icon: "💵", balance: 1000 },
-  { symbol: "DAI", name: "Dai", icon: "🟡", balance: 500 },
-  { symbol: "USDC", name: "USD Coin", icon: "🔵", balance: 750 },
+  { symbol: "ETH", name: "Ethereum", icon: "🔷", balance: 0.19, address: "0x0000000000000000000000000000000000000000" },
+  { symbol: "USDT", name: "Tether", icon: "💵", balance: 1000, address: "0x" },
+  { symbol: "DAI", name: "Dai", icon: "🟡", balance: 500, address: "0x" },
+  { symbol: "USDC", name: "USD Coin", icon: "🔵", balance: 750, address: "0x" },
 ];
 
 export function UniswapDesktop() {
@@ -36,6 +40,27 @@ export function UniswapDesktop() {
   const [isActiveUser, setIsActiveUser] = useState(false);
   const [volatility, setVolatility] = useState<"low" | "medium" | "high">("medium");
   const [isLoading, setIsLoading] = useState(false);
+  const { address } = useAccount();
+
+  const { executeSwap, isConfirming } = useUniswapV4Swap(token1, token2, amount1);
+
+  const handleSwapClick = async () => {
+    try {
+      setIsLoading(true);
+      console.log("Executing swap...");
+      await executeSwap();
+    } catch (error) {
+      console.error("Swap failed:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!isConfirming && isLoading) {
+      setIsLoading(false);
+    }
+  }, [isConfirming]);
 
   const calculateFee = () => {
     let baseFee = 0.3; // 0.3%
@@ -64,19 +89,6 @@ export function UniswapDesktop() {
 
   const handleMax = () => {
     setAmount1(token1.balance.toString());
-  };
-
-  const handleSwapConfirm = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      setSwapResult({
-        swappedAmount: `${amount1} ${token1.symbol} → ${amount2} ${token2.symbol}`,
-        fee: `${((parseFloat(amount1) * fee) / 100).toFixed(6)} ${token1.symbol}`,
-        hash: "0x1234...5678",
-      });
-      setIsModalOpen(true);
-    }, 1000);
   };
 
   return (
@@ -240,8 +252,19 @@ export function UniswapDesktop() {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button className="w-full bg-pink-500 text-white hover:bg-pink-600" onClick={handleSwapConfirm}>
-                    Swap
+                  <Button
+                    className="w-full bg-pink-500 text-white hover:bg-pink-600"
+                    onClick={handleSwapClick} // ここを変更
+                    disabled={!address || !amount1 || isLoading}
+                  >
+                    {isLoading ? (
+                      <div className="flex items-center justify-center">
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        スワップ処理中...
+                      </div>
+                    ) : (
+                      "スワップ"
+                    )}
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -262,15 +285,18 @@ export function UniswapDesktop() {
         </div>
       </main>
 
-      <Dialog open={isLoading} onOpenChange={setIsLoading}>
+      <Dialog open={isLoading || isConfirming} onOpenChange={setIsLoading}>
         <DialogContent className="sm:max-w-[425px]">
           <div className="flex flex-col items-center justify-center space-y-4 py-6">
             <Loader2 className="h-8 w-8 animate-spin text-pink-500" />
             <DialogTitle>Processing Transaction</DialogTitle>
-            <DialogDescription>Please wait...</DialogDescription>
+            <DialogDescription>
+              {isConfirming ? "Waiting for confirmation..." : "Initiating transaction..."}
+            </DialogDescription>
           </div>
         </DialogContent>
       </Dialog>
+
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
