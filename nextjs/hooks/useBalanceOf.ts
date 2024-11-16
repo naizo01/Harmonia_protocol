@@ -1,7 +1,7 @@
 import { abis } from "../lib/constants/abi";
 import { useAccount, useReadContract } from "wagmi";
 
-export default function useBalanceOf(
+export function useBalanceOf(
   tokenAddress?: `0x${string}`,
 ): ReturnType<typeof useReadContract<readonly unknown[], "balanceOf", readonly unknown[]>> {
   const { address: accentAddress } = useAccount();

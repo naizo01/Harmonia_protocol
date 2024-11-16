@@ -1,4 +1,4 @@
-import { UniswapDesktop } from "../components/uniswap-desktop";
+import { UniswapDesktop } from "../components/UniswapDesktop";
 
 const Home: NextPage = () => {
   return (
