@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useWeb3Auth } from "../pages/_app";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
@@ -7,11 +8,11 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/t
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { ArrowUpDown, Check, ChevronDown, Info, Loader2, Search, Settings } from "lucide-react";
 import { parseEther } from "viem";
+import { simulateContract } from "viem/actions/public/simulateContract";
 import { useAccount, useChainId, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import { abis } from "~~/lib/constants/abi";
 // import {useUniswapV4Swap} from "~~/hooks/use-uniswap";
 import { contractsAddress } from "~~/lib/constants/address";
-import { abis } from "~~/lib/constants/abi";
-import { simulateContract } from "viem/actions/public/simulateContract";
 
 type Token = {
   symbol: string;
@@ -21,6 +22,8 @@ type Token = {
   address: string;
 };
 export function UniswapDesktop(callbacks?: { onSuccessWrite?: (data: any) => void; onError?: (error: any) => void }) {
+  const web3AuthInstance = useWeb3Auth(); // web3AuthInstanceを取得
+  console.log(web3AuthInstance.getUserInfo());
   const chainId = useChainId();
   const tokens: Token[] = [
     { symbol: "ETH", name: "Ethereum", icon: "🔷", balance: 0.19, address: contractsAddress[chainId]?.currency0 },
