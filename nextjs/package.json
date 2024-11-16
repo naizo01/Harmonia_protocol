@@ -12,6 +12,12 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.0.11",
+    "@lit-protocol/auth-helpers": "^6.11.0",
+    "@lit-protocol/constants": "^6.11.0",
+    "@lit-protocol/lit-auth-client": "^6.11.0",
+    "@lit-protocol/lit-node-client": "^6.11.0",
+    "@lit-protocol/pkp-ethers": "^6.11.0",
+    "@lit-protocol/types": "^6.11.0",
     "@nextui-org/react": "^2.1.13",
     "@radix-ui/react-dialog": "^1.1.2",
     "@radix-ui/react-dropdown-menu": "^2.1.2",
