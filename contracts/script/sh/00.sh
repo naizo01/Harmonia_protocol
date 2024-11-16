@@ -13,5 +13,6 @@ forge script script/00_HarmoniaDynamicFee.s.sol:HarmoniaDynamicFeeScript \
   --verifier-url $SCAN_URL \
   --private-key $PRIVATE_KEY \
   --etherscan-api-key $SCAN_API_KEY \
+  --priority-gas-price 100000000 \
   --broadcast \
   --verify -vvvv

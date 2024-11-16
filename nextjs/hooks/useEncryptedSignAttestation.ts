@@ -8,7 +8,7 @@ export const useEncryptedSignAttestation = () => {
 
     const encryptAttestation = async (attestationData: any) => {
         try {
-            // Basic EVM access control conditions
+            // dummy data is included because there is no use case for external decoding,
             const accessControlConditions = [
                 {
                     contractAddress: '',

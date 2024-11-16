@@ -30,11 +30,11 @@ contract CounterScript is Script, DeployPermit2 {
     using EasyPosm for IPositionManager;
 
     // chiliz address
-    address constant CREATE2_DEPLOYER =
-        address(0x333AA54C25A171dc2d425eBF17b4C4458738202D);
+    // address constant CREATE2_DEPLOYER =
+    //     address(0x333AA54C25A171dc2d425eBF17b4C4458738202D);
 
     // old
-    // address constant CREATE2_DEPLOYER = address(0x4e59b44847b379578588920cA78FbF26c0B4956C);
+    address constant CREATE2_DEPLOYER = address(0x4e59b44847b379578588920cA78FbF26c0B4956C);
 
     function setUp() public {}
 
@@ -109,7 +109,7 @@ contract CounterScript is Script, DeployPermit2 {
     function deployPosm(
         IPoolManager poolManager
     ) public returns (IPositionManager) {
-        anvilPermit2();
+        etchPermit2();
         return
             IPositionManager(
                 new PositionManager(

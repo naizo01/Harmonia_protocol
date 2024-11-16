@@ -7,7 +7,10 @@ import {IAllowanceTransfer} from "permit2/src/interfaces/IAllowanceTransfer.sol"
 
 /// @notice Shared constants used in scripts
 contract Constants {
-    address constant CREATE2_DEPLOYER = address(0x4e59b44847b379578588920cA78FbF26c0B4956C);
+    // chiliz
+    address constant CREATE2_DEPLOYER = address(0x333AA54C25A171dc2d425eBF17b4C4458738202D);
+    // old
+    // address constant CREATE2_DEPLOYER = address(0x4e59b44847b379578588920cA78FbF26c0B4956C);
 
     /// @dev populated with default anvil addresses
     IPoolManager constant POOLMANAGER = IPoolManager(address(0x7Da1D65F8B249183667cdE74C5CBD46dD38AA829));

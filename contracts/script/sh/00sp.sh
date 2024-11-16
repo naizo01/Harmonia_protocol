@@ -12,9 +12,8 @@ forge script script/00_SP.s.sol:spScript \
   --private-key $PRIVATE_KEY \
   --broadcast \
   --chain-id $CHAIN_ID \
-  --gas-estimate-multiplier 300 \
-  --priority-gas-price 100000000 \
+  --priority-gas-price 10000000000 \
   -vvvv
-  --verifier-url $SCAN_URL \
-  --etherscan-api-key $SCAN_API_KEY \
-  --verify \
+  # --verifier-url $SCAN_URL \
+  # --etherscan-api-key $SCAN_API_KEY \
+  # --verify \
