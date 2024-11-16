@@ -12,19 +12,27 @@ import { CHAIN_NAMESPACES, UX_MODE, WEB3AUTH_NETWORK } from "@web3auth/base";
 import { EthereumPrivateKeyProvider } from "@web3auth/ethereum-provider";
 import { Web3Auth } from "@web3auth/modal";
 import { Web3AuthConnector } from "@web3auth/web3auth-wagmi-connector";
-import { Chain, anvil, baseSepolia, sepolia } from "viem/chains";
-import { WagmiProvider } from "wagmi";
+import { Chain, anvil, baseSepolia } from "viem/chains";
+import { WagmiProvider, http } from "wagmi";
 import { createConnector as createWagmiConnector } from "wagmi";
 
 const clientId = process.env.NEXT_PUBLIC_WEB3AUTH_CLIENT_ID || ""; // get from https://dashboard.web3auth.io
 
+// const chainConfig = {
+//   chainNamespace: CHAIN_NAMESPACES.EIP155,
+//   chainId: "0x7A69",
+//   rpcTarget: "http://127.0.0.1:8545",
+//   displayName: "Anvil Local",
+//   ticker: "ETH",
+//   tickerName: "localETH",
+// };
 const chainConfig = {
   chainNamespace: CHAIN_NAMESPACES.EIP155,
-  chainId: "0x7A69",
-  rpcTarget: "http://127.0.0.1:8545",
-  displayName: "Anvil Local",
+  chainId: "0x14a34",
+  rpcTarget: "https://sepolia.base.org",
+  displayName: "Base Sepolia",
   ticker: "ETH",
-  tickerName: "localETH",
+  tickerName: "ETH",
 };
 
 const privateKeyProvider = new EthereumPrivateKeyProvider({ config: { chainConfig } });
@@ -83,11 +91,15 @@ const DynamicFeeApp = ({ Component, pageProps }: AppProps) => {
     },
   });
 
-  const chains = [sepolia, baseSepolia, anvil] as [Chain, ...Chain[]];
+  const chains = [baseSepolia, anvil] as [Chain, ...Chain[]];
 
   const config = getDefaultConfig({
     appName: "dynamicFee App",
     chains: chains,
+    transports: {
+      [baseSepolia.id]: http(),
+      [anvil.id]: http(),
+    },
     projectId: "3a8170812b534d0ff9d794f19a901d64",
     ssr: false,
     wallets: [

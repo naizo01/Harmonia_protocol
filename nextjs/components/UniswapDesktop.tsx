@@ -1,5 +1,8 @@
 // components/UniswapDesktop.tsx
 import { useEffect, useState } from "react";
+import { useLitContext } from "../context/LitContext";
+import { useVerificationContext } from "../context/VerificationContext";
+import { useApprove } from "../hooks/useApprove";
 import { useBalanceOf } from "../hooks/useBalanceOf";
 import { useSwapExecution } from "../hooks/useSwapExecution";
 import { Token, useSwapState } from "../hooks/useSwapState";
@@ -11,14 +14,18 @@ import SwapForm from "./SwapForm";
 import TransactionProcessingDialog from "./TransactionProcessingDialog";
 import { Button } from "./ui/button";
 import { Loader2 } from "lucide-react";
+import { Settings } from "lucide-react";
+import { formatEther } from "viem";
 import { useAccount, useChainId } from "wagmi";
 import { contractsAddress } from "~~/lib/constants/address";
 
 export function UniswapDesktop() {
-  const chainId = useChainId();
+  let chainId = useChainId();
   const { address } = useAccount();
   const [initialTokens, setInitialTokens] = useState<Token[]>([]);
-
+  const { currentAccount, sessionSigs, ethAddress, defaultChainId } = useLitContext();
+  const { verificationData } = useVerificationContext();
+  chainId = ethAddress ? defaultChainId : chainId;
   useEffect(() => {
     if (chainId) {
       const tokensData = [
@@ -38,20 +45,36 @@ export function UniswapDesktop() {
     }
   }, [chainId]);
   const { tokens, amounts, setToken, setAmount, handleSwapTokens, handleMax } = useSwapState(initialTokens);
-  const { userInfo } = useUserAttestation();
-
   const ethBalance = useBalanceOf(initialTokens[0]?.address as `0x${string}`);
   const usdtBalance = useBalanceOf(initialTokens[1]?.address as `0x${string}`);
 
   useEffect(() => {
     // バランスが取得できたらトークンのバランスを更新
     if (ethBalance.data) {
-      setInitialTokens(prevTokens => [{ ...prevTokens[0], balance: Number(ethBalance.data) }, prevTokens[1]]);
+      setInitialTokens(prevTokens => [
+        { ...prevTokens[0], balance: Number(formatEther(ethBalance.data as bigint)) },
+        prevTokens[1],
+      ]);
     }
     if (usdtBalance.data) {
-      setInitialTokens(prevTokens => [prevTokens[0], { ...prevTokens[1], balance: Number(usdtBalance.data) }]);
+      setInitialTokens(prevTokens => [
+        prevTokens[0],
+        { ...prevTokens[1], balance: Number(formatEther(usdtBalance.data as bigint)) },
+      ]);
     }
   }, [ethBalance.data, usdtBalance.data]);
+
+  const [volatility, setVolatility] = useState<"low" | "medium" | "high">("medium");
+
+  const { userInfo } = useUserAttestation();
+  const [isCommunityMember, setIsCommunityMember] = useState(false);
+  const [isActiveUser, setIsActiveUser] = useState(false);
+
+  useEffect(() => {
+    setIsCommunityMember(verificationData.communityIsMember);
+    setIsActiveUser(verificationData.activeIsActive);
+    setVolatility("low");
+  }, [verificationData]);
 
   const {
     isLoading,
@@ -62,31 +85,23 @@ export function UniswapDesktop() {
     isModalOpen,
     setIsModalOpen,
     executeSwap,
-  } = useSwapExecution(tokens, amounts, address);
+  } = useSwapExecution(tokens, amounts, address, verificationData);
 
   const handleSwapClick = async () => {
     await executeSwap();
   };
 
-  const [isCommunityMember, setIsCommunityMember] = useState(false);
-  const [isActiveUser, setIsActiveUser] = useState(false);
-  const [volatility, setVolatility] = useState<"low" | "medium" | "high">("medium");
-  console.log(tokens);
+  const handleApproveClick = async () => {
+    await writeContractApprove();
+  };
 
-  useEffect(() => {
-    // ここで実際のデータを取得して状態を更新します
-    setIsCommunityMember(Math.random() < 0.5);
-    setIsActiveUser(Math.random() < 0.5);
-    setVolatility(Math.random() < 0.33 ? "low" : Math.random() < 0.66 ? "medium" : "high");
-  }, []);
+  const { writeContract: writeContractApprove } = useApprove();
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
-
-      <main className="container max-w-xl mx-auto p-8 pb-16">
+      <main className="container max-w-xl mx-auto p-4 pb-16">
         <div className="bg-background border rounded-3xl shadow-sm">
-          {/* SwapForm コンポーネントを使用 */}
           <SwapForm
             tokensList={initialTokens}
             tokens={tokens}
@@ -96,23 +111,28 @@ export function UniswapDesktop() {
             onSwapTokens={handleSwapTokens}
             onMaxClick={handleMax}
           />
+          <FeeInfo isCommunityMember={isCommunityMember} isActiveUser={isActiveUser} volatility={volatility} />
 
-          {/* スワップ手数料情報などの残りの部分 */}
           <div className="p-4 space-y-4">
-            <FeeInfo isCommunityMember={isCommunityMember} isActiveUser={isActiveUser} volatility={volatility} />
-
+            <Button
+              className="w-full bg-pink-500 text-white hover:bg-pink-600"
+              onClick={handleApproveClick}
+              disabled={!address && !currentAccount}
+            >
+              Approve
+            </Button>
             <Button
               className="w-full bg-pink-500 text-white hover:bg-pink-600"
               onClick={handleSwapClick}
-              disabled={!address || !amounts[0] || isLoading}
+              disabled={(!address && !currentAccount) || !amounts[0] || isLoading}
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  スワップ処理中...
+                  Processing Swap...
                 </div>
               ) : (
-                "スワップ"
+                "Swap"
               )}
             </Button>
           </div>
@@ -127,7 +147,7 @@ export function UniswapDesktop() {
       </main>
 
       <TransactionProcessingDialog
-        isOpen={isLoading || isConfirming}
+        isOpen={isLoading}
         isConfirming={isConfirming}
         onOpenChange={isOpen => {
           if (!isOpen) {
