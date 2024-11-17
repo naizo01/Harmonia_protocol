@@ -14,5 +14,5 @@ forge script script/Anvil.s.sol:CounterScript \
   --broadcast \
   --verifier-url $SCAN_URL \
   --etherscan-api-key $SCAN_API_KEY \
-  --priority-gas-price 100000000 \
+  --priority-gas-price 10000000000 \
   -vvvv --via-ir

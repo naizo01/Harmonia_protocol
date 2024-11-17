@@ -14,4 +14,5 @@ forge script script/02_AddLiquidity.s.sol:AddLiquidityScript \
   --private-key $PRIVATE_KEY \
   --etherscan-api-key $SCAN_API_KEY \
   --broadcast \
-  --verify -vvvv
+  --verify \
+  -vvvv

@@ -11,9 +11,9 @@ forge script script/00_WhitelistHook.s.sol:WhitelistHookScript \
   --rpc-url $RPC_URL \
   --chain-id $CHAIN_ID \
   --private-key $PRIVATE_KEY \
-  --priority-gas-price 10000000000 \
   --broadcast \
   -vvvv
+  # --priority-gas-price 1000000000000 \
   # --verifier-url $SCAN_URL \
   # --etherscan-api-key $SCAN_API_KEY \
   # --verify \
