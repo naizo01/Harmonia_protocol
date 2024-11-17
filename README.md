@@ -4,6 +4,17 @@ The Harmonia Protocol is designed to ensure the sustainable prosperity of the co
 
 To determine community membership, joining the Discord server is required. For seamless integration, Lit Protocol and Web3Auth are utilized. Membership proof is recorded in the Sign Attestation. The use of OAuth access tokens for authentication, along with Lit encryption to anonymize Discord IDs, ensures both seamless integration with the Discord community and the safety of member data.
 
+### Components Utilized
+
+- **Sign Protocol**: Generate schemas and store attestations.
+- **Sign API**: Issue attestation transactions.
+- **Sign Indexing**: Retrieve attestations using indexed values.
+- **Uniswap V4 Hooks**: Create hooks and pools.
+- **Pyth**: Fetch price feeds from oracle.
+- **Web3Auth Social Login**: Login via Discord.
+- **Lit Protocol Social Login**: Login via Discord.
+- **Lit Protocol Encryption**: Conceal the linkage between Discord ID and address.
+
 ## Chain Addresses
 
 ### HarmoniaDynamicFee
