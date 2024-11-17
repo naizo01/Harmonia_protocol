@@ -13,7 +13,7 @@ contract Constants {
     // address constant CREATE2_DEPLOYER = address(0x4e59b44847b379578588920cA78FbF26c0B4956C);
 
     /// @dev populated with default anvil addresses
-    IPoolManager constant POOLMANAGER = IPoolManager(address(0x7Da1D65F8B249183667cdE74C5CBD46dD38AA829));
-    PositionManager constant posm = PositionManager(address(0xcDbe7b1ed817eF0005ECe6a3e576fbAE2EA5EAFE));
+    IPoolManager constant POOLMANAGER = IPoolManager(address(0x2cB17bC0414233b3998459F460D18E3774e9F40B));
+    PositionManager constant posm = PositionManager(address(0x6643ACcf10C80899dB0ED2b8555D8145c3ec824b));
     IAllowanceTransfer constant PERMIT2 = IAllowanceTransfer(address(0x000000000022D473030F116dDEE9F6B43aC78BA3));
 }

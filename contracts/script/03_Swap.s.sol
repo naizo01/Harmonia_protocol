@@ -31,7 +31,7 @@ contract SwapScript is DeployBase, Constants {
 
     // PoolSwapTest Contract address, default to the anvil address
     PoolSwapTest swapRouter =
-        PoolSwapTest(0x96E3495b712c6589f1D2c50635FDE68CF17AC83c);
+        PoolSwapTest(0x1dDb64EE653069b86493E3214a7e7EFbC950bb73);
 
     // --- pool configuration --- //
     // fees paid by swappers that accrue to liquidity providers
